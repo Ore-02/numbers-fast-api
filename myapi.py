@@ -16,6 +16,8 @@ app.add_middleware(
 )
 
 def check_perfect_sum(num):
+    if num <= 0:
+        return False 
     half_num = int(num/2)
     divisor = []
     for n in range(1,half_num+1):
@@ -51,19 +53,14 @@ def digit_sum(num):
     total = sum(d for d in digits)
     return total
 
-def is_valid_integer(value: str) -> bool:
-    """Check if the value is a valid integer."""
-    try:
-        int(value)
-        return True
-    except ValueError:
-        return False
-
 @app.get("/api/classify-number")
 async def classify_number(number: str = Query(..., description="The number to classify")):
     
-    if not is_valid_integer(number):
-        return {"number": number, "error": True}
+    # Validate if 'num' is an integer
+    try:
+        num = int(num)
+    except ValueError:
+        return HTTPException(status_code=400, detail={"number": num, "error": True})
     
     number = int(number) 
 
