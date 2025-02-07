@@ -5,10 +5,7 @@ import requests
 
 app = FastAPI()
 
-origins = [
-    "http://localhost.tiangolo.com",
-    "https://localhost.tiangolo.com",
-]
+origins = ["*"]
 
 app.add_middleware(
     CORSMiddleware,
