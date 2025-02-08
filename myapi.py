@@ -31,7 +31,7 @@ def check_prime(n):
     return True
     
 def check_armstrong(num):
-    digits = [int(d) for d in str(num)]
+    digits = [int(d) for d in str(abs(num))]
     power = len(digits)
     total = sum(d ** power for d in digits)
     if total == num:
@@ -44,23 +44,27 @@ def is_odd(num):
     return False
 
 def digit_sum(num):
-    digits = [int(d) for d in str(num)]
+    digits = [int(d) for d in str(abs(num))]
     total = sum(d for d in digits)
     return total
 
 @app.get("/api/classify-number")
 async def classify_number(number: str):
     
-    # Validate if 'num' is an integer
-    if not number.isdigit():
-        return {
-    "number": number,
-    "error": True}, 400
-    
-    number = int(number)  # Convert to integer
+    try:
+        num = float(number)  # Convert to float first
+        if num != int(num):  # If it's a float, return error
+            return {"number": number,"error": True},400
+        num = int(num)  # Convert safely to integer
+    except ValueError:
+        return {"number": number,"error": True},400
 
-    response = requests.get(f"http://numbersapi.com/{number}?json")
-    response_json = response.json()
+    try:
+        response = requests.get(f"http://numbersapi.com/{num}?json")
+        response_json = response.json()
+        fun_fact = response_json.get("text", "No fact available.")
+    except Exception:
+        fun_fact = "No fact available."
     
     json_format = {
     "number": number,
@@ -68,7 +72,7 @@ async def classify_number(number: str):
     "is_perfect": False,
     "properties": [],
     "digit_sum": digit_sum(number), # sum of its digits
-    "fun_fact": response_json["text"]
+    "fun_fact": fun_fact
     }
     
     if check_perfect_sum(number) is True:
