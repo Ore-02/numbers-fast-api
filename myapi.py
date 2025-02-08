@@ -55,12 +55,12 @@ async def classify_number(number: str):
         num = float(number)  # Convert to float first
         if num != int(num):  # If it's a float, return error
             return {"number": number,"error": True},400
-        num = int(num)  # Convert safely to integer
+        number = int(num)  # Convert safely to integer
     except ValueError:
         return {"number": number,"error": True},400
 
     try:
-        response = requests.get(f"http://numbersapi.com/{num}?json")
+        response = requests.get(f"http://numbersapi.com/{number}?json")
         response_json = response.json()
         fun_fact = response_json.get("text", "No fact available.")
     except Exception:
