@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import requests
 
@@ -18,14 +18,9 @@ app.add_middleware(
 def check_perfect_sum(num):
     if num <= 0:
         return False 
-    half_num = int(num/2)
-    divisor = []
-    for n in range(1,half_num+1):
-        if num % n == 0:
-            divisor.append(n)
-    if sum(divisor) == num:
-        return True
-    return False
+    half_num = num // 2
+    divisor = [n for n in range(1, half_num + 1) if num % n == 0]
+    return sum(divisor) == num
     
 def check_prime(n):
     if n < 2:
@@ -54,15 +49,15 @@ def digit_sum(num):
     return total
 
 @app.get("/api/classify-number")
-async def classify_number(number: str = Query(..., description="The number to classify")):
+async def classify_number(number: str):
     
     # Validate if 'num' is an integer
-    try:
-        num = int(number)
-    except ValueError:
-        return HTTPException(status_code=400, detail={"number": num, "error": True})
+    if not number.isdigit():
+        return {
+    "number": number,
+    "error": True}, 400
     
-    number = int(number) 
+    number = int(number)  # Convert to integer
 
     response = requests.get(f"http://numbersapi.com/{number}?json")
     response_json = response.json()
